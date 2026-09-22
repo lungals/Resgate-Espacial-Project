@@ -577,7 +577,7 @@ public class AStarStepByStep : MonoBehaviour
             return Color.yellow;
 
         if (radiation <= 8)
-            return new Color(1f, 0.5f, 0f);
+            return Color.red;
 
         return new Color(0.5f, 0f, 0f);
     }
