@@ -1,4 +1,3 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,6 +55,11 @@ public class AStarStepByStep : MonoBehaviour
         new List<Transform>();
 
     [SerializeField] private float radiationUpdateInterval = 0.5f;
+    [SerializeField] private int radiationIncreasePerStep = 1;
+
+    [Header("Area da Radiacao")]
+    [SerializeField] private int radiationArea = 1;
+    [SerializeField] private int radiationAreaIncreasePerStep = 1;
 
     [Header("Posicao da Grade")]
     [SerializeField] private bool autoCenterGrid = true;
@@ -68,12 +72,17 @@ public class AStarStepByStep : MonoBehaviour
     private Node targetNode;
     private bool finished;
     private float nextRadiationUpdateTime;
+    private int radiationLevel;
     private Coroutine movementCoroutine;
 
     void Start()
     {
         CalculateGridOrigin();
         CreateGrid();
+
+        radiationLevel = 1;
+        nextRadiationUpdateTime =
+            Time.time + radiationUpdateInterval;
 
         UpdateRadiationCosts();
         ResetSearch();
@@ -90,6 +99,14 @@ public class AStarStepByStep : MonoBehaviour
         {
             nextRadiationUpdateTime =
                 Time.time + radiationUpdateInterval;
+
+            // A intensidade e a area aumentam juntas,
+            // a cada 0,5 segundos.
+            radiationLevel += radiationIncreasePerStep;
+            radiationArea += radiationAreaIncreasePerStep;
+
+            //Limite para que a área nunca passe de dez.
+            radiationArea = Mathf.Min(radiationArea, 5);
 
             if (UpdateRadiationCostsInternal())
             {
@@ -188,25 +205,39 @@ public class AStarStepByStep : MonoBehaviour
                         Mathf.Abs(node.x - sourceNode.x) +
                         Mathf.Abs(node.y - sourceNode.y);
 
-                    // Valores fixos de perigo exigidos.
+                    // Valores fixos de perigo exigidos,
+                    // multiplicados pelo nivel de radiacao.
+                    // Celulas dentro da area atual, mas fora
+                    // das 4 primeiras distancias, recebem o
+                    // perigo minimo (1).
+                    int baseCost;
+
                     switch (distance)
                     {
                         case 0:
-                            node.radiationCost += 8;
+                            baseCost = 8;
                             break;
 
                         case 1:
-                            node.radiationCost += 5;
+                            baseCost = 5;
                             break;
 
                         case 2:
-                            node.radiationCost += 3;
+                            baseCost = 3;
                             break;
 
                         case 3:
-                            node.radiationCost += 1;
+                            baseCost = 1;
+                            break;
+
+                        default:
+                            baseCost =
+                                distance <= radiationArea ? 1 : 0;
                             break;
                     }
+
+                    node.radiationCost +=
+                        baseCost * radiationLevel;
                 }
 
                 if (oldRadiation != node.radiationCost)
@@ -542,6 +573,7 @@ public class AStarStepByStep : MonoBehaviour
             }
         }
 
+        // A esfera amarela acompanha a area atual da radiacao.
         Gizmos.color = Color.yellow;
 
         foreach (Transform source in radiationSources)
@@ -550,7 +582,7 @@ public class AStarStepByStep : MonoBehaviour
             {
                 Gizmos.DrawWireSphere(
                     source.position,
-                    4f * nodeSize
+                    (radiationArea + 1f) * nodeSize
                 );
             }
         }

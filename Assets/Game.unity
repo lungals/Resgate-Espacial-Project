@@ -1106,6 +1106,9 @@ MonoBehaviour:
   - {fileID: 2045003355}
   - {fileID: 1538827804}
   radiationUpdateInterval: 0.5
+  radiationIncreasePerStep: 1
+  radiationArea: 5
+  radiationAreaIncreasePerStep: 1
   autoCenterGrid: 0
   gridOrigin: {x: 0, y: 0.5, z: 0}
 --- !u!4 &1177715003
