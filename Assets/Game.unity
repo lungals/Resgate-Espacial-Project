@@ -1103,8 +1103,6 @@ MonoBehaviour:
   radiationSources:
   - {fileID: 1091308224}
   - {fileID: 2029993388}
-  - {fileID: 0}
-  - {fileID: 0}
   radiationUpdateInterval: 3
   radiationIncreasePerStep: 1
   radiationArea: 5
@@ -1925,6 +1923,6 @@ SceneRoots:
   - {fileID: 1406025768}
   - {fileID: 2052155270}
   - {fileID: 285699604}
-  - {fileID: 1091308224}
   - {fileID: 2029993388}
+  - {fileID: 1091308224}
   - {fileID: 1177715003}
